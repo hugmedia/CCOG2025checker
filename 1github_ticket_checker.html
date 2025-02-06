@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบข้อมูล</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .logo {
+            width: 20%;
+            margin-bottom: 20px;
+        }
+        .box {
+            border-radius: 20px;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 20px auto;
+            width: 70%;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .green-box {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .red-box {
+            background-color: #F44336;
+            color: white;
+        }
+        input {
+            font-size: 1.5em;
+            padding: 10px;
+            margin-top: 20px;
+            width: 80%;
+        }
+        .large-number {
+            font-size: 2.4em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <img src="https://www.jotform.com/uploads/ccog2025/form_files/1213442.677a6a3700e6a5.65909140.png" class="logo" alt="Logo">
+    <h1>ตรวจสอบข้อมูล</h1>
+    <input type="text" id="ticketInput" placeholder="ค้นหาด้วย Ticket ID, ชื่อ, นามสกุล หรือข้อมูลใด ๆ" oninput="findTicket()">
+    <div id="ticketInfo" class="box green-box">
+        TICKET ID: <span id="ticketId">-</span><br>
+        ชื่อ-นามสกุล: <span id="name">-</span><br>
+        อาชีพ: <span id="occupation">-</span><br>
+        ไซส์เสื้อ: <span id="shirtSize">-</span>
+    </div>
+    <div id="registerInfo" class="box red-box">
+        ช่องลงทะเบียน<br>
+        <span class="large-number" id="registerNumber">-</span>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch("data.json");
+                const ticketData = await response.json();
+                window.ticketData = ticketData;
+            } catch (error) {
+                console.error("Error loading data:", error);
+            }
+        }
+
+        function findTicket() {
+            const query = document.getElementById("ticketInput").value.trim().toLowerCase();
+            if (!window.ticketData) return;
+
+            const info = window.ticketData.find(item => {
+                return Object.values(item).some(value => String(value).toLowerCase().includes(query));
+            });
+
+            if (info) {
+                document.getElementById("ticketId").textContent = info['Ticket ID'] || '-';
+                document.getElementById("name").textContent = (info['ชื่อ'] || '-') + ' ' + (info['นามสกุล'] || '-');
+                document.getElementById("occupation").textContent = info['อาชีพ'] || '-';
+                document.getElementById("shirtSize").textContent = info['ไซส์เสื้อ'] || '-';
+                document.getElementById("registerNumber").textContent = info['ช่องลงทะเบียน'] || '-';
+            } else {
+                document.getElementById("ticketId").textContent = '-';
+                document.getElementById("name").textContent = '-';
+                document.getElementById("occupation").textContent = '-';
+                document.getElementById("shirtSize").textContent = '-';
+                document.getElementById("registerNumber").textContent = '-';
+            }
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
